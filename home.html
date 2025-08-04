@@ -1,0 +1,580 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Secure Authentication System</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .container {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+            padding: 40px;
+            width: 100%;
+            max-width: 450px;
+            transition: all 0.3s ease;
+        }
+
+        .container:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.15);
+        }
+
+        .auth-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .auth-header h1 {
+            color: #333;
+            font-size: 2.5rem;
+            font-weight: 300;
+            margin-bottom: 10px;
+        }
+
+        .auth-header p {
+            color: #666;
+            font-size: 1rem;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+            position: relative;
+        }
+
+        .form-group label {
+            display: block;
+            color: #555;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 15px 20px;
+            border: 2px solid #e1e5e9;
+            border-radius: 12px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            background: #fff;
+        }
+
+        .form-group input:focus, .form-group select:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .btn {
+            width: 100%;
+            padding: 15px;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn-secondary {
+            background: #f8f9fa;
+            color: #667eea;
+            border: 2px solid #667eea;
+            margin-top: 10px;
+        }
+
+        .btn-secondary:hover {
+            background: #667eea;
+            color: white;
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%);
+            color: white;
+            margin-left: 10px;
+        }
+
+        .btn-danger:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(255, 107, 107, 0.3);
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .dashboard {
+            text-align: center;
+        }
+
+        .user-info {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 25px;
+        }
+
+        .user-info h2 {
+            margin-bottom: 10px;
+        }
+
+        .role-badge {
+            display: inline-block;
+            padding: 5px 15px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 20px;
+            font-size: 0.9rem;
+            margin-top: 10px;
+        }
+
+        .protected-content {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            border-left: 5px solid #667eea;
+        }
+
+        .admin-panel {
+            background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+        }
+
+        .message {
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            font-weight: 500;
+        }
+
+        .message.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .message.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .switch-form {
+            text-align: center;
+            margin-top: 20px;
+            color: #666;
+        }
+
+        .switch-form a {
+            color: #667eea;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .switch-form a:hover {
+            text-decoration: underline;
+        }
+
+        .users-list {
+            text-align: left;
+        }
+
+        .user-item {
+            background: white;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                margin: 20px;
+                padding: 30px 20px;
+            }
+            
+            .button-group {
+                flex-direction: column;
+            }
+            
+            .btn-danger {
+                margin-left: 0;
+                margin-top: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Login Form -->
+        <div id="loginForm" class="auth-form">
+            <div class="auth-header">
+                <h1>Welcome Back</h1>
+                <p>Sign in to your account</p>
+            </div>
+            
+            <div id="message"></div>
+            
+            <form id="login">
+                <div class="form-group">
+                    <label for="loginEmail">Email Address</label>
+                    <input type="email" id="loginEmail" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="loginPassword">Password</label>
+                    <input type="password" id="loginPassword" required>
+                </div>
+                
+                <button type="submit" class="btn btn-primary">Sign In</button>
+            </form>
+            
+            <div class="switch-form">
+                Don't have an account? <a href="#" onclick="showRegister()">Sign up here</a>
+            </div>
+        </div>
+
+        <!-- Registration Form -->
+        <div id="registerForm" class="auth-form hidden">
+            <div class="auth-header">
+                <h1>Join Us</h1>
+                <p>Create your account</p>
+            </div>
+            
+            <div id="registerMessage"></div>
+            
+            <form id="register">
+                <div class="form-group">
+                    <label for="regName">Full Name</label>
+                    <input type="text" id="regName" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="regEmail">Email Address</label>
+                    <input type="email" id="regEmail" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="regPassword">Password</label>
+                    <input type="password" id="regPassword" required minlength="6">
+                </div>
+                
+                <div class="form-group">
+                    <label for="regConfirmPassword">Confirm Password</label>
+                    <input type="password" id="regConfirmPassword" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="regRole">Role</label>
+                    <select id="regRole" required>
+                        <option value="user">User</option>
+                        <option value="admin">Admin</option>
+                        <option value="moderator">Moderator</option>
+                    </select>
+                </div>
+                
+                <button type="submit" class="btn btn-primary">Create Account</button>
+            </form>
+            
+            <div class="switch-form">
+                Already have an account? <a href="#" onclick="showLogin()">Sign in here</a>
+            </div>
+        </div>
+
+        <!-- Dashboard -->
+        <div id="dashboard" class="hidden">
+            <div class="user-info">
+                <h2 id="welcomeUser">Welcome!</h2>
+                <p id="userEmail"></p>
+                <span id="userRole" class="role-badge"></span>
+            </div>
+            
+            <div class="protected-content">
+                <h3>🔒 Protected Content</h3>
+                <p>This content is only visible to authenticated users. Your session is secure and managed with proper authentication tokens.</p>
+            </div>
+            
+            <div id="adminPanel" class="admin-panel hidden">
+                <h3>👑 Admin Panel</h3>
+                <p>Welcome to the admin panel! You have elevated privileges.</p>
+                <div id="usersList" class="users-list">
+                    <h4>Registered Users:</h4>
+                </div>
+            </div>
+            
+            <div id="moderatorPanel" class="admin-panel hidden">
+                <h3>🛡️ Moderator Panel</h3>
+                <p>Moderator tools and controls are available here.</p>
+            </div>
+            
+            <div class="button-group">
+                <button onclick="refreshSession()" class="btn btn-secondary">Refresh Session</button>
+                <button onclick="logout()" class="btn btn-danger">Logout</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // In-memory storage for demo purposes (replace with backend in production)
+        let users = [
+            {
+                id: 1,
+                name: 'Admin User',
+                email: 'admin@example.com',
+                password: hashPassword('admin123'),
+                role: 'admin'
+            },
+            {
+                id: 2,
+                name: 'John Doe',
+                email: 'user@example.com',
+                password: hashPassword('user123'),
+                role: 'user'
+            }
+        ];
+        
+        let currentUser = null;
+        let sessionToken = null;
+        let sessionExpiry = null;
+
+        // Simple hash function for demo (use bcrypt in production)
+        function hashPassword(password) {
+            let hash = 0;
+            for (let i = 0; i < password.length; i++) {
+                const char = password.charCodeAt(i);
+                hash = ((hash << 5) - hash) + char;
+                hash = hash & hash; // Convert to 32-bit integer
+            }
+            return hash.toString();
+        }
+
+        // Generate session token
+        function generateSessionToken() {
+            return Math.random().toString(36).substr(2) + Date.now().toString(36);
+        }
+
+        // Check if session is valid
+        function isValidSession() {
+            return sessionToken && sessionExpiry && Date.now() < sessionExpiry;
+        }
+
+        // Show message
+        function showMessage(elementId, message, type = 'error') {
+            const messageEl = document.getElementById(elementId);
+            messageEl.innerHTML = `<div class="message ${type}">${message}</div>`;
+            setTimeout(() => {
+                messageEl.innerHTML = '';
+            }, 5000);
+        }
+
+        // Show login form
+        function showLogin() {
+            document.getElementById('loginForm').classList.remove('hidden');
+            document.getElementById('registerForm').classList.add('hidden');
+            document.getElementById('dashboard').classList.add('hidden');
+        }
+
+        // Show register form
+        function showRegister() {
+            document.getElementById('loginForm').classList.add('hidden');
+            document.getElementById('registerForm').classList.remove('hidden');
+            document.getElementById('dashboard').classList.add('hidden');
+        }
+
+        // Show dashboard
+        function showDashboard() {
+            document.getElementById('loginForm').classList.add('hidden');
+            document.getElementById('registerForm').classList.add('hidden');
+            document.getElementById('dashboard').classList.remove('hidden');
+            
+            // Update user info
+            document.getElementById('welcomeUser').textContent = `Welcome, ${currentUser.name}!`;
+            document.getElementById('userEmail').textContent = currentUser.email;
+            document.getElementById('userRole').textContent = currentUser.role.toUpperCase();
+            
+            // Show role-specific content
+            if (currentUser.role === 'admin') {
+                document.getElementById('adminPanel').classList.remove('hidden');
+                updateUsersList();
+            } else {
+                document.getElementById('adminPanel').classList.add('hidden');
+            }
+            
+            if (currentUser.role === 'moderator') {
+                document.getElementById('moderatorPanel').classList.remove('hidden');
+            } else {
+                document.getElementById('moderatorPanel').classList.add('hidden');
+            }
+        }
+
+        // Update users list for admin
+        function updateUsersList() {
+            const usersList = document.getElementById('usersList');
+            let html = '<h4>Registered Users:</h4>';
+            
+            users.forEach(user => {
+                html += `
+                    <div class="user-item">
+                        <div>
+                            <strong>${user.name}</strong><br>
+                            <small>${user.email} - ${user.role}</small>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            usersList.innerHTML = html;
+        }
+
+        // Login handler
+        document.getElementById('login').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
+            const hashedPassword = hashPassword(password);
+            
+            // Find user
+            const user = users.find(u => u.email === email && u.password === hashedPassword);
+            
+            if (user) {
+                currentUser = { ...user };
+                sessionToken = generateSessionToken();
+                sessionExpiry = Date.now() + (24 * 60 * 60 * 1000); // 24 hours
+                
+                showMessage('message', 'Login successful! Redirecting...', 'success');
+                setTimeout(() => {
+                    showDashboard();
+                }, 1500);
+            } else {
+                showMessage('message', 'Invalid email or password!');
+            }
+        });
+
+        // Register handler
+        document.getElementById('register').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const name = document.getElementById('regName').value;
+            const email = document.getElementById('regEmail').value;
+            const password = document.getElementById('regPassword').value;
+            const confirmPassword = document.getElementById('regConfirmPassword').value;
+            const role = document.getElementById('regRole').value;
+            
+            // Validation
+            if (password !== confirmPassword) {
+                showMessage('registerMessage', 'Passwords do not match!');
+                return;
+            }
+            
+            if (password.length < 6) {
+                showMessage('registerMessage', 'Password must be at least 6 characters long!');
+                return;
+            }
+            
+            // Check if user already exists
+            if (users.find(u => u.email === email)) {
+                showMessage('registerMessage', 'User with this email already exists!');
+                return;
+            }
+            
+            // Create new user
+            const newUser = {
+                id: users.length + 1,
+                name: name,
+                email: email,
+                password: hashPassword(password),
+                role: role
+            };
+            
+            users.push(newUser);
+            
+            showMessage('registerMessage', 'Account created successfully! Please login.', 'success');
+            setTimeout(() => {
+                showLogin();
+            }, 2000);
+        });
+
+        // Logout function
+        function logout() {
+            currentUser = null;
+            sessionToken = null;
+            sessionExpiry = null;
+            showLogin();
+            showMessage('message', 'You have been logged out successfully.', 'success');
+        }
+
+        // Refresh session
+        function refreshSession() {
+            if (currentUser && isValidSession()) {
+                sessionExpiry = Date.now() + (24 * 60 * 60 * 1000); // Extend by 24 hours
+                showMessage('message', 'Session refreshed successfully!', 'success');
+            } else {
+                showMessage('message', 'Session expired. Please login again.');
+                logout();
+            }
+        }
+
+        // Check session on page load
+        function checkSession() {
+            if (currentUser && isValidSession()) {
+                showDashboard();
+            } else {
+                showLogin();
+            }
+        }
+
+        // Auto logout on session expiry
+        setInterval(() => {
+            if (currentUser && !isValidSession()) {
+                showMessage('message', 'Session expired. Please login again.');
+                logout();
+            }
+        }, 60000); // Check every minute
+
+        // Initialize
+        checkSession();
+    </script>
+</body>
+</html>
